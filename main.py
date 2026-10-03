@@ -8,6 +8,8 @@ Run:
 """
 import sys
 
+from flask import Flask, jsonify
+
 import file_handler as fh
 import analysis as an
 import visualization as viz
@@ -246,6 +248,20 @@ def run_demo():
     hx.generate_html(students)
     extracted = hx.print_extracted_info()
     print("Round-trip check (CSV == HTML data):", extracted == students)
+
+
+app = Flask(__name__)
+
+
+@app.get("/")
+def index():
+    """Return the CSV-backed student summary for the Vercel deployment."""
+    students = fh.read_students()
+    return jsonify({
+        "name": "Student Information & Visualization System",
+        "students": students,
+        "statistics": an.numpy_statistics(students),
+    })
 
 
 if __name__ == "__main__":
